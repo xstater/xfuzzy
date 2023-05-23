@@ -6,7 +6,7 @@ export const path = rgPath;
 
 export interface RipGrepArgs {
     folders?: string
-    pattern?: string
+    pattern: string
 }
 
 const defaultArgs = {
