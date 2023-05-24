@@ -116,5 +116,6 @@ export async function cmdSearchInWorkspace() {
         return;
     }
 
+    // todo: jump to selected file and position
     vscode.window.showInformationMessage(result);
 }
