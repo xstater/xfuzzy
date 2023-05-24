@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "xfuzzy.searchLines",
-        "title": "XFuzzy: Search lines in workspace"
+        "command": "xfuzzy.searchInWorkspace",
+        "title": "XFuzzy: Search in workspace"
       }
     ]
   },
