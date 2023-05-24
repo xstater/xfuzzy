@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { cmdSearchInWorkspace } from './in_workspace';
+import { cmdSearchInWorkspace } from './search_in_workspace';
 
 export function activate(context: vscode.ExtensionContext) {
 
