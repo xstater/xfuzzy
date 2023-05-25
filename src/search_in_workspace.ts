@@ -24,7 +24,7 @@ function promptPattern(): Promise<string | undefined> {
         inputBox.show();
     });
 }
-async function pickResult(pattern: string): Promise<string | undefined> {
+async function pickResult(pattern: string): Promise<PickedItem| undefined> {
     const SEARCHING_TEXT = "Searching...   ";
 
     const resultPicker = new ResultPicker();
@@ -75,6 +75,7 @@ async function pickResult(pattern: string): Promise<string | undefined> {
                     return {
                         // default is [(start_line = end_line)]
                         lineNumber: (result.ranges as rg.ISearchRange[])[0].startLineNumber,
+                        column: (result.ranges as rg.ISearchRange[])[0].startColumn,
                         text: result.preview.text
                     };
                 })
@@ -95,27 +96,32 @@ async function pickResult(pattern: string): Promise<string | undefined> {
         // cancel rg
         rgCancelHandle.cancel();
 
-        return result?.text;
+        return result;
     } else {
         resultPicker.picker.busy = false;
         // rg is faster than user, just wait for user complete it works
-        const result = await pickedResult;
-        return result?.text;
+        return await pickedResult;
     }
 }
 
 export async function cmdSearchInWorkspace() {
-    let pattern = await promptPattern();
+    const pattern = await promptPattern();
     if (pattern === undefined) {
         vscode.window.showInformationMessage("No result can be found");
         return;
     }
 
-    let result = await pickResult(pattern);
+    const result = await pickResult(pattern);
     if (result === undefined) {
         return;
     }
 
-    // todo: jump to selected file and position
-    vscode.window.showInformationMessage(result);
+    console.log('will jump to:', result);
+
+    const doc = await vscode.workspace.openTextDocument(result.filePath);
+    const editor = await vscode.window.showTextDocument(doc, );
+
+    const pos = new vscode.Position(result.lineNumber, result.column);
+    editor.selection = new vscode.Selection(pos, pos);
 }
+
