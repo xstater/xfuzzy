@@ -4,13 +4,15 @@ import * as vscode from 'vscode';
 export class PickedItem implements vscode.QuickPickItem{
     readonly filePath: string;
     readonly lineNumber: number;
+    readonly column: number;
     readonly text: string;
 
     readonly label: string;
 
-    constructor(filePath: string, lineNumber: number, text: string) {
+    constructor(filePath: string, text: string, lineNumber: number, column: number = 0) {
         this.filePath = filePath;
         this.lineNumber = lineNumber;
+        this.column = column;
         this.text = text;
 
         this.label = this.lineNumber + ": " + text;
@@ -32,6 +34,7 @@ class Separator implements vscode.QuickPickItem {
 
 export interface Result {
     lineNumber: number
+    column?: number
     text: string
 }
 
@@ -57,8 +60,8 @@ export class ResultPicker {
     addResultsInFile(resultInFile: ResultsInFile) {
         const results =
             ([new Separator(resultInFile.filePath)] as (PickedItem | Separator)[])
-                .concat(resultInFile.results.map(result => 
-                    new PickedItem(resultInFile.filePath, result.lineNumber, result.text)
+                .concat(resultInFile.results.map(result =>
+                    new PickedItem(resultInFile.filePath, result.text, result.lineNumber, result.column)
                 ));
         this._count += resultInFile.results.length;
         this.picker.items = this.picker.items.concat(results);
