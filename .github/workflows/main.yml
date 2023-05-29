@@ -16,6 +16,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 16.x
+    - run: npm install
     - name: Package VS Code Extension
       uses: nhedger/package-vscode-extension@v1
 
