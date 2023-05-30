@@ -3,7 +3,7 @@ import * as rg from 'ripgrep-wrapper';
 import { rgPath } from '@vscode/ripgrep';
 import { PickedItem, ResultPicker } from './results_picker';
 
-function promptPattern(): Promise<string | undefined> {
+function promptPattern(pattern = ""): Promise<string | undefined> {
     return new Promise((resolve, _) => {
         /// input a pattern to search
         const inputBox = vscode.window.createInputBox();
@@ -11,7 +11,7 @@ function promptPattern(): Promise<string | undefined> {
         inputBox.totalSteps = 2;
         inputBox.title = "Search In Workspace";
         inputBox.prompt = "input a pattern to search";
-        inputBox.value = "*";
+        inputBox.value = pattern;
         inputBox.valueSelection = undefined; // select all
         inputBox.onDidAccept(() => {
             resolve(inputBox.value);
@@ -105,8 +105,19 @@ async function pickResult(pattern: string): Promise<PickedItem| undefined> {
 }
 
 export async function cmdSearchInWorkspace() {
-    const pattern = await promptPattern();
-    if (pattern === undefined) {
+    // get highlight word as default pattern
+    const activeEditor = vscode.window.activeTextEditor;
+    const cursorStart = activeEditor?.selection.start;
+    let pattern : string | undefined = "";
+    if (cursorStart)
+    {
+        const wordRange = activeEditor?.document.getWordRangeAtPosition(cursorStart);
+        const highlight = activeEditor?.document.getText(wordRange);
+        pattern = highlight;
+    }
+
+    pattern = await promptPattern(pattern);
+    if (pattern=== undefined) {
         vscode.window.showInformationMessage("No result can be found");
         return;
     }
@@ -119,7 +130,7 @@ export async function cmdSearchInWorkspace() {
     // console.log('will jump to:', result);
 
     const doc = await vscode.workspace.openTextDocument(result.filePath);
-    const editor = await vscode.window.showTextDocument(doc, );
+    const editor = await vscode.window.showTextDocument(doc );
 
     const pos = new vscode.Position(result.lineNumber, result.column);
     editor.selection = new vscode.Selection(pos, pos);
