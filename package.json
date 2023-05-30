@@ -2,13 +2,29 @@
   "name": "xfuzzy",
   "displayName": "xfuzzy",
   "description": "fuzzy finder in vscode",
+  "publisher": "xstater",
+  "author": {
+    "name": "xstater",
+    "email": "a166224@163.com",
+    "url": "https://github.com/xstater"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xstater/xfuzzy.git"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.78.0"
   },
+  "keywords": [
+    "fuzzy",
+    "finder",
+    "ripgrep"
+  ],
   "categories": [
     "Other"
   ],
+  "preview": true,
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
