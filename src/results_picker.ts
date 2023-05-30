@@ -9,13 +9,22 @@ export class PickedItem implements vscode.QuickPickItem{
 
     readonly label: string;
 
-    constructor(filePath: string, text: string, lineNumber: number, column: number = 0) {
+    constructor(filePath: string, text: string, lineNumber: number, column: number = 1) {
         this.filePath = filePath;
         this.lineNumber = lineNumber;
         this.column = column;
         this.text = text;
 
         this.label = this.lineNumber + ": " + text;
+    }
+
+    async jumpTo() {
+        const doc = await vscode.workspace.openTextDocument(this.filePath);
+        const editor = await vscode.window.showTextDocument(doc );
+
+        const pos = new vscode.Position(this.lineNumber - 1, this.column - 1);
+        editor.selection = new vscode.Selection(pos, pos);
+        editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
     }
 }
 
