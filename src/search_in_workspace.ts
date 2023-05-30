@@ -74,8 +74,8 @@ async function pickResult(pattern: string): Promise<PickedItem| undefined> {
                 results: matchResult.results.filter(isITextSearchMatch).map(result => {
                     return {
                         // default is [(start_line = end_line)]
-                        lineNumber: (result.ranges as rg.ISearchRange[])[0].startLineNumber,
-                        column: (result.ranges as rg.ISearchRange[])[0].startColumn,
+                        lineNumber: (result.ranges as rg.ISearchRange[])[0].startLineNumber + 1,
+                        column: (result.ranges as rg.ISearchRange[])[0].startColumn + 1,
                         text: result.preview.text
                     };
                 })
@@ -117,8 +117,7 @@ export async function cmdSearchInWorkspace() {
     }
 
     pattern = await promptPattern(pattern);
-    if (pattern=== undefined) {
-        vscode.window.showInformationMessage("No result can be found");
+    if (pattern === undefined) {
         return;
     }
 
@@ -129,10 +128,6 @@ export async function cmdSearchInWorkspace() {
 
     // console.log('will jump to:', result);
 
-    const doc = await vscode.workspace.openTextDocument(result.filePath);
-    const editor = await vscode.window.showTextDocument(doc );
-
-    const pos = new vscode.Position(result.lineNumber, result.column);
-    editor.selection = new vscode.Selection(pos, pos);
+    await result.jumpTo();
 }
 
