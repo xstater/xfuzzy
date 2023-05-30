@@ -24,7 +24,7 @@ function promptPattern(pattern = ""): Promise<string | undefined> {
         inputBox.show();
     });
 }
-async function pickResult(pattern: string): Promise<PickedItem| undefined> {
+async function pickResult(pattern: string): Promise<PickedItem | undefined> {
     const SEARCHING_TEXT = "Searching...   ";
 
     const resultPicker = new ResultPicker();
@@ -108,15 +108,17 @@ export async function cmdSearchInWorkspace() {
     // get highlight word as default pattern
     const activeEditor = vscode.window.activeTextEditor;
     const cursorStart = activeEditor?.selection.start;
-    let pattern : string | undefined = "";
-    if (cursorStart)
-    {
-        const wordRange = activeEditor?.document.getWordRangeAtPosition(cursorStart);
-        const highlight = activeEditor?.document.getText(wordRange);
-        pattern = highlight;
+
+    let prePattern = "";
+
+    if (activeEditor && cursorStart) {
+        const wordRange = activeEditor.document.getWordRangeAtPosition(cursorStart);
+        if (wordRange) {
+            prePattern = activeEditor.document.getText(wordRange);
+        }
     }
 
-    pattern = await promptPattern(pattern);
+    let pattern = await promptPattern(prePattern);
     if (pattern === undefined) {
         return;
     }
