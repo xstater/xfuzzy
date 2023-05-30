@@ -16,6 +16,10 @@
       {
         "command": "xfuzzy.searchInWorkspace",
         "title": "XFuzzy: Search in workspace"
+      },
+      {
+        "command": "xfuzzy.searchInActiveEditor",
+        "title": "XFuzzy: Search in active editor"
       }
     ]
   },
