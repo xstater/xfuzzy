@@ -67,7 +67,7 @@ async function pickResult(pattern: string): Promise<PickedItem| undefined> {
                 continue;
             }
 
-            console.log("Added:", matchResult);
+            // console.log("Added:", matchResult);
 
             resultPicker.addResultsInFile({
                 filePath: matchResult.path,
@@ -84,12 +84,12 @@ async function pickResult(pattern: string): Promise<PickedItem| undefined> {
 
         resultPicker.picker.title = SEARCHING_TEXT + resultPicker.count;
     }, message => {
-        console.log('message', message);
+        // console.log('message', message);
     });
 
     const result = await Promise.race([searchResult, pickedResult]);
 
-    console.log('race result:', result);
+    // console.log('race result:', result);
 
     if (result instanceof PickedItem || result === undefined) {
         // user action is faster than rg
@@ -116,7 +116,7 @@ export async function cmdSearchInWorkspace() {
         return;
     }
 
-    console.log('will jump to:', result);
+    // console.log('will jump to:', result);
 
     const doc = await vscode.workspace.openTextDocument(result.filePath);
     const editor = await vscode.window.showTextDocument(doc, );
