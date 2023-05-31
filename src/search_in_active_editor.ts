@@ -30,7 +30,7 @@ export async function cmdSearchInActiveEditor() {
                 label: lineText.lineNumber + ": " + lineText.text
             };
         });
-    
+
     picker.addResults({
         separator: new Separator({
             document: activeEditor.document,
@@ -42,8 +42,7 @@ export async function cmdSearchInActiveEditor() {
     });
 
     const result = await picker.pickOne();
-    if (result === undefined)
-    {
+    if (result === undefined) {
         return;
     }
 
