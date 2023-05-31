@@ -68,6 +68,7 @@ export class Picker {
 
     constructor() {
         this.rawPicker = vscode.window.createQuickPick();
+        this.rawPicker.canSelectMany = false;
     }
 
     public get count() {
