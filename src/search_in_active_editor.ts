@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { Picker, Separator } from './picker';
+import { CanBePickedItem, PickedItem, Picker, Separator, ToString } from './picker';
+import { jumpTo } from './helper';
 
 export async function cmdSearchInActiveEditor() {
     const picker = new Picker();
@@ -23,11 +24,11 @@ export async function cmdSearchInActiveEditor() {
         .filter((lineText, _, __) => !lineText.isEmptyOrWhitespace)
         .map((lineText, _, __) => {
             return {
-                lineNumber: lineText.lineNumber + 1,
-                column: 1,
+                lineNumber: lineText.lineNumber,
+                column: 0,
                 filePath: activeEditor.document.uri,
                 text: lineText.text,
-                label: lineText.lineNumber + ": " + lineText.text
+                label: (lineText.lineNumber + 1) + ": " + lineText.text
             };
         });
 
@@ -39,6 +40,19 @@ export async function cmdSearchInActiveEditor() {
             }
         }),
         items: results
+    });
+
+    const currentPos = activeEditor.selection.start;
+    picker.rawPicker.onDidChangeActive(async selected => {
+        if (!selected) {
+            return;
+        }
+        const item = selected[0];
+        if (!(item instanceof Separator<ToString>)){
+            await (new PickedItem(item)).jumpTo();
+        } else {
+            await jumpTo(activeEditor, currentPos.line, currentPos.character);
+        }
     });
 
     const result = await picker.pickOne();
