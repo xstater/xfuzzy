@@ -1,38 +1,48 @@
-import { ResultPicker } from "./results_picker";
 import * as vscode from 'vscode';
+import { Picker, Separator } from './picker';
 
 export async function cmdSearchInActiveEditor() {
-    const resultPicker = new ResultPicker();
+    const picker = new Picker();
 
-    resultPicker.picker.title = "Pick Result";
-    resultPicker.picker.canSelectMany = false;
-    resultPicker.picker.busy = false;
+    picker.rawPicker.title = "Pick Result";
+    picker.rawPicker.canSelectMany = false;
+    picker.rawPicker.busy = false;
 
     const activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) {
         vscode.window.showInformationMessage("No active editor");
         return;
     }
-
-    const text = activeEditor.document.getText();
-    const lines = text.split(/\r?\n/);
+    const range = (start: number, end: number) =>
+        Array.from(Array(end - start + 1).keys()).map(x => x + start);
+    // const text = activeEditor.document.getText();
+    // const lines = text.split(/\r?\n/);
+    const lines = range(0, activeEditor.document.lineCount - 1)
+        .map(activeEditor.document.lineAt);
     const results = lines
-        .map((lineText, lineIndex, _) => {
+        .filter((lineText, _, __) => !lineText.isEmptyOrWhitespace)
+        .map((lineText, _, __) => {
             return {
-                lineNumber: lineIndex + 1,
+                lineNumber: lineText.lineNumber + 1,
                 column: 1,
-                text: lineText
+                filePath: activeEditor.document.uri,
+                text: lineText.text,
+                label: lineText.lineNumber + ": " + lineText.text
             };
         });
-    
-    resultPicker.addResultsInFile({
-        filePath: activeEditor.document.uri.fsPath,
-        results: results
+
+    picker.addResults({
+        separator: new Separator({
+            document: activeEditor.document,
+            toString(): string {
+                return this.document.fileName;
+            }
+        }),
+        items: results
     });
 
-    const result = await resultPicker.pickOne();
-    if (result === undefined)
-    {
+    const result = await picker.pickOne();
+    if (result === undefined) {
         return;
     }
 
