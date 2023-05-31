@@ -40,14 +40,16 @@ export interface Results {
 }
 
 export class PickedItem {
-    filePath: vscode.Uri;
-    lineNumber: number;
-    column: number;
+    readonly rawItem: CanBePickedItem;
+    readonly filePath: vscode.Uri;
+    readonly lineNumber: number;
+    readonly column: number;
 
-    constructor(filePath: vscode.Uri, lineNumber: number, column: number) {
-        this.filePath = filePath;
-        this.lineNumber = lineNumber;
-        this.column = column;
+    constructor(rawItem: CanBePickedItem) {
+        this.rawItem = rawItem;
+        this.filePath = rawItem.filePath;
+        this.lineNumber = rawItem.lineNumber;
+        this.column = rawItem.column;
     }
 
     async jumpTo() {
@@ -62,7 +64,7 @@ export class PickedItem {
 }
 
 export class Picker {
-    rawPicker: vscode.QuickPick<CanBePickedItem | Separator<ToString>>;
+    readonly rawPicker: vscode.QuickPick<CanBePickedItem | Separator<ToString>>;
 
     private _count = 0;
 
@@ -101,7 +103,7 @@ export class Picker {
                 /// [0] is safe, because DidAccept must have one element at least 
                 const selected = this.rawPicker.selectedItems[0] as CanBePickedItem;
 
-                resolve(new PickedItem(selected.filePath, selected.lineNumber, selected.column));
+                resolve(new PickedItem(selected));
 
                 this.dispose();
             });
