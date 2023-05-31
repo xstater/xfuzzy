@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as rg from 'ripgrep-wrapper';
 import { rgPath } from '@vscode/ripgrep';
-import { PickedItem, ResultPicker } from './results_picker';
+import { PickedItem, Picker, Separator } from './picker';
 
 function promptPattern(pattern = ""): Promise<string | undefined> {
     return new Promise((resolve, _) => {
@@ -27,13 +27,13 @@ function promptPattern(pattern = ""): Promise<string | undefined> {
 async function pickResult(pattern: string): Promise<PickedItem | undefined> {
     const SEARCHING_TEXT = "Searching...   ";
 
-    const resultPicker = new ResultPicker();
+    const resultPicker = new Picker();
 
-    resultPicker.picker.title = SEARCHING_TEXT;
-    resultPicker.picker.step = 2;
-    resultPicker.picker.totalSteps = 2;
-    resultPicker.picker.canSelectMany = false;
-    resultPicker.picker.busy = true;
+    resultPicker.rawPicker.title = SEARCHING_TEXT;
+    resultPicker.rawPicker.step = 2;
+    resultPicker.rawPicker.totalSteps = 2;
+    resultPicker.rawPicker.canSelectMany = false;
+    resultPicker.rawPicker.busy = true;
 
     const pickedResult = resultPicker.pickOne();
 
@@ -69,20 +69,29 @@ async function pickResult(pattern: string): Promise<PickedItem | undefined> {
 
             // console.log("Added:", matchResult);
 
-            resultPicker.addResultsInFile({
-                filePath: matchResult.path,
-                results: matchResult.results.filter(isITextSearchMatch).map(result => {
+            resultPicker.addResults({
+                separator: new Separator({
+                    filePath: matchResult.path,
+
+                    toString() : string {
+                        return this.filePath;
+                    }
+                }),
+                items: matchResult.results.filter(isITextSearchMatch).map(result => {
+                    const lineNumber = (result.ranges as rg.ISearchRange[])[0].startLineNumber + 1;
                     return {
                         // default is [(start_line = end_line)]
-                        lineNumber: (result.ranges as rg.ISearchRange[])[0].startLineNumber + 1,
+                        lineNumber: lineNumber,
                         column: (result.ranges as rg.ISearchRange[])[0].startColumn + 1,
-                        text: result.preview.text
+                        text: result.preview.text,
+                        filePath: vscode.Uri.file(matchResult.path),
+                        label: lineNumber + ": " + result.preview.text
                     };
                 })
             });
         }
 
-        resultPicker.picker.title = SEARCHING_TEXT + resultPicker.count;
+        resultPicker.rawPicker.title = SEARCHING_TEXT + resultPicker.count;
     }, message => {
         // console.log('message', message);
     });
@@ -98,7 +107,7 @@ async function pickResult(pattern: string): Promise<PickedItem | undefined> {
 
         return result;
     } else {
-        resultPicker.picker.busy = false;
+        resultPicker.rawPicker.busy = false;
         // rg is faster than user, just wait for user complete it works
         return await pickedResult;
     }
