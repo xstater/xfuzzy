@@ -78,14 +78,14 @@ async function pickResult(pattern: string): Promise<PickedItem | undefined> {
                     }
                 }),
                 items: matchResult.results.filter(isITextSearchMatch).map(result => {
-                    const lineNumber = (result.ranges as rg.ISearchRange[])[0].startLineNumber + 1;
+                    const lineNumber = (result.ranges as rg.ISearchRange[])[0].startLineNumber;
                     return {
                         // default is [(start_line = end_line)]
                         lineNumber: lineNumber,
-                        column: (result.ranges as rg.ISearchRange[])[0].startColumn + 1,
+                        column: (result.ranges as rg.ISearchRange[])[0].startColumn,
                         text: result.preview.text,
                         filePath: vscode.Uri.file(matchResult.path),
-                        label: lineNumber + ": " + result.preview.text
+                        label: (lineNumber + 1) + ": " + result.preview.text
                     };
                 })
             });

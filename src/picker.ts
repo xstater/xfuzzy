@@ -56,7 +56,7 @@ export class PickedItem {
         const doc = await vscode.workspace.openTextDocument(this.filePath);
         const editor = await vscode.window.showTextDocument(doc);
 
-        const pos = new vscode.Position(this.lineNumber - 1, this.column - 1);
+        const pos = new vscode.Position(this.lineNumber, this.column);
         editor.selection = new vscode.Selection(pos, pos);
         editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
     }
